@@ -25,7 +25,7 @@ type EditState = {
 
 const cardAnimation = {
   hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0 }
+  visible: { opacity: 1, y: 0 },
 };
 
 export function CatalogApp() {
@@ -77,7 +77,7 @@ export function CatalogApp() {
         item.Brand,
         item.Model,
         item.Processor,
-        item.Deskripsi
+        item.Deskripsi,
       ]
         .join(" ")
         .toLowerCase();
@@ -91,7 +91,7 @@ export function CatalogApp() {
     return {
       total: items.length,
       inStock,
-      outOfStock: items.length - inStock
+      outOfStock: items.length - inStock,
     };
   }, [items]);
 
@@ -108,7 +108,7 @@ export function CatalogApp() {
       Harga: item.Harga,
       Stok: String(item.Stok),
       FotoURL: item.FotoURL,
-      Deskripsi: item.Deskripsi
+      Deskripsi: item.Deskripsi,
     });
   }
 
@@ -142,9 +142,9 @@ export function CatalogApp() {
           Harga: editValue.Harga,
           Stok: nextStock,
           FotoURL: editValue.FotoURL,
-          Deskripsi: editValue.Deskripsi
+          Deskripsi: editValue.Deskripsi,
         };
-      })
+      }),
     );
 
     closeEdit();
@@ -176,7 +176,7 @@ export function CatalogApp() {
       `Produk: ${item.Brand} ${item.Model}`,
       `Harga: ${item.Harga}`,
       `Stok: ${item.Stok}`,
-      `Spesifikasi: ${item.Processor}, ${item.RAM}, ${item.Storage}`
+      `Spesifikasi: ${item.Processor}, ${item.RAM}, ${item.Storage}`,
     ]
       .filter((line) => line.length > 0)
       .join("\n");
@@ -200,7 +200,11 @@ export function CatalogApp() {
       </button>
 
       <section className="container">
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+        >
           <div className="stats">
             <StatCard title="Total Item" value={String(summary.total)} />
             <StatCard title="Ready Stock" value={String(summary.inStock)} />
@@ -242,7 +246,7 @@ export function CatalogApp() {
           animate="visible"
           variants={{
             hidden: { opacity: 1 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.06 } }
+            visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
           }}
         >
           {filteredItems.map((item) => (
@@ -305,27 +309,112 @@ export function CatalogApp() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            onClick={() => {
+              closeEdit();
+              closeDetail();
+            }}
           >
             <motion.div
               className="modal"
               initial={{ opacity: 0, y: 20, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.98 }}
+              onClick={(event) => event.stopPropagation()}
             >
               {editValue ? (
                 <>
                   <h4>Hot Edit Item</h4>
                   <div className="form-grid">
-                    <InputField label="ProductID" value={editValue.ProductID} onChange={(value) => setEditValue((prev) => (prev ? { ...prev, ProductID: value } : prev))} />
-                    <InputField label="Kategori" value={editValue.Kategori} onChange={(value) => setEditValue((prev) => (prev ? { ...prev, Kategori: value } : prev))} />
-                    <InputField label="Brand" value={editValue.Brand} onChange={(value) => setEditValue((prev) => (prev ? { ...prev, Brand: value } : prev))} />
-                    <InputField label="Model" value={editValue.Model} onChange={(value) => setEditValue((prev) => (prev ? { ...prev, Model: value } : prev))} />
-                    <InputField label="Processor" value={editValue.Processor} onChange={(value) => setEditValue((prev) => (prev ? { ...prev, Processor: value } : prev))} />
-                    <InputField label="RAM" value={editValue.RAM} onChange={(value) => setEditValue((prev) => (prev ? { ...prev, RAM: value } : prev))} />
-                    <InputField label="Storage" value={editValue.Storage} onChange={(value) => setEditValue((prev) => (prev ? { ...prev, Storage: value } : prev))} />
-                    <InputField label="Harga" value={editValue.Harga} onChange={(value) => setEditValue((prev) => (prev ? { ...prev, Harga: value } : prev))} />
-                    <InputField label="Stok" value={editValue.Stok} onChange={(value) => setEditValue((prev) => (prev ? { ...prev, Stok: value } : prev))} />
-                    <InputField label="FotoURL" value={editValue.FotoURL} onChange={(value) => setEditValue((prev) => (prev ? { ...prev, FotoURL: value } : prev))} />
+                    <InputField
+                      label="ProductID"
+                      value={editValue.ProductID}
+                      onChange={(value) =>
+                        setEditValue((prev) =>
+                          prev ? { ...prev, ProductID: value } : prev,
+                        )
+                      }
+                    />
+                    <InputField
+                      label="Kategori"
+                      value={editValue.Kategori}
+                      onChange={(value) =>
+                        setEditValue((prev) =>
+                          prev ? { ...prev, Kategori: value } : prev,
+                        )
+                      }
+                    />
+                    <InputField
+                      label="Brand"
+                      value={editValue.Brand}
+                      onChange={(value) =>
+                        setEditValue((prev) =>
+                          prev ? { ...prev, Brand: value } : prev,
+                        )
+                      }
+                    />
+                    <InputField
+                      label="Model"
+                      value={editValue.Model}
+                      onChange={(value) =>
+                        setEditValue((prev) =>
+                          prev ? { ...prev, Model: value } : prev,
+                        )
+                      }
+                    />
+                    <InputField
+                      label="Processor"
+                      value={editValue.Processor}
+                      onChange={(value) =>
+                        setEditValue((prev) =>
+                          prev ? { ...prev, Processor: value } : prev,
+                        )
+                      }
+                    />
+                    <InputField
+                      label="RAM"
+                      value={editValue.RAM}
+                      onChange={(value) =>
+                        setEditValue((prev) =>
+                          prev ? { ...prev, RAM: value } : prev,
+                        )
+                      }
+                    />
+                    <InputField
+                      label="Storage"
+                      value={editValue.Storage}
+                      onChange={(value) =>
+                        setEditValue((prev) =>
+                          prev ? { ...prev, Storage: value } : prev,
+                        )
+                      }
+                    />
+                    <InputField
+                      label="Harga"
+                      value={editValue.Harga}
+                      onChange={(value) =>
+                        setEditValue((prev) =>
+                          prev ? { ...prev, Harga: value } : prev,
+                        )
+                      }
+                    />
+                    <InputField
+                      label="Stok"
+                      value={editValue.Stok}
+                      onChange={(value) =>
+                        setEditValue((prev) =>
+                          prev ? { ...prev, Stok: value } : prev,
+                        )
+                      }
+                    />
+                    <InputField
+                      label="FotoURL"
+                      value={editValue.FotoURL}
+                      onChange={(value) =>
+                        setEditValue((prev) =>
+                          prev ? { ...prev, FotoURL: value } : prev,
+                        )
+                      }
+                    />
                     <label className="field textarea-field">
                       <span>Deskripsi</span>
                       <textarea
@@ -335,9 +424,9 @@ export function CatalogApp() {
                             prev
                               ? {
                                   ...prev,
-                                  Deskripsi: event.target.value
+                                  Deskripsi: event.target.value,
                                 }
-                              : prev
+                              : prev,
                           )
                         }
                       />
@@ -347,7 +436,11 @@ export function CatalogApp() {
                     <button className="ghost" type="button" onClick={closeEdit}>
                       Cancel
                     </button>
-                    <button className="primary" type="button" onClick={saveEdit}>
+                    <button
+                      className="primary"
+                      type="button"
+                      onClick={saveEdit}
+                    >
                       Save changes
                     </button>
                   </div>
@@ -363,9 +456,13 @@ export function CatalogApp() {
                       productId={detailItem.ProductID}
                     />
                   </div>
-                  <h4>{detailItem.Brand} {detailItem.Model}</h4>
+                  <h4>
+                    {detailItem.Brand} {detailItem.Model}
+                  </h4>
                   <p className="order-intro">{detailItem.Harga}</p>
-                  <p className="detail-desc">{detailItem.Deskripsi || "Tanpa deskripsi"}</p>
+                  <p className="detail-desc">
+                    {detailItem.Deskripsi || "Tanpa deskripsi"}
+                  </p>
                   <dl className="specs detail-specs">
                     <Spec label="Kategori" value={detailItem.Kategori} />
                     <Spec label="CPU" value={detailItem.Processor} />
@@ -375,8 +472,12 @@ export function CatalogApp() {
                     <Spec label="ID Produk" value={detailItem.ProductID} />
                   </dl>
                   <div className="modal-actions">
-                    <button className="ghost" type="button" onClick={closeDetail}>
-                      Batal
+                    <button
+                      className="ghost"
+                      type="button"
+                      onClick={closeDetail}
+                    >
+                      Tutup
                     </button>
                     <button
                       className="primary wa-order-btn"
@@ -418,7 +519,7 @@ function StatCard({ title, value }: { title: string; value: string }) {
 function InputField({
   label,
   value,
-  onChange
+  onChange,
 }: {
   label: string;
   value: string;
@@ -434,7 +535,13 @@ function InputField({
 
 function WhatsAppIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 32 32"
+      fill="none"
+      aria-hidden="true"
+    >
       <path
         d="M27.6 4.4A15.87 15.87 0 0 0 16.1 0C7.3 0 .2 7.1.2 15.9c0 2.8.7 5.6 2.1 8L0 32l8.3-2.2a15.8 15.8 0 0 0 7.6 1.9h.1c8.8 0 15.9-7.1 15.9-15.9A15.8 15.8 0 0 0 27.6 4.4Zm-11.5 24.6h-.1a13 13 0 0 1-6.6-1.8l-.5-.3-4.9 1.3 1.3-4.8-.3-.5a12.9 12.9 0 0 1-2-7c0-7.2 5.8-13 13-13 3.5 0 6.8 1.4 9.2 3.8a13 13 0 0 1-9.1 22.3Zm7.1-9.7c-.4-.2-2.2-1.1-2.5-1.2-.3-.1-.5-.2-.7.2-.2.4-.8 1.2-1 1.4-.2.2-.3.2-.7.1-.4-.2-1.5-.5-2.8-1.7-1-1-1.7-2.1-1.9-2.5-.2-.4 0-.5.2-.7l.5-.5c.2-.2.3-.3.4-.5.1-.2 0-.4 0-.6 0-.2-.7-1.8-1-2.4-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.4-1.1 1.1-1.1 2.7s1.1 3.1 1.2 3.3c.2.2 2.2 3.5 5.4 4.9.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 2.1-.9 2.4-1.7.3-.8.3-1.5.2-1.7-.1-.2-.3-.2-.7-.4Z"
         fill="currentColor"
@@ -446,7 +553,7 @@ function WhatsAppIcon() {
 function CardImage({
   src,
   alt,
-  productId
+  productId,
 }: {
   src: string;
   alt: string;
@@ -458,7 +565,7 @@ function CardImage({
     `${localBase}.webp`,
     `${localBase}.jpg`,
     `${localBase}.png`,
-    "https://placehold.co/1200x800/141925/e3ebff?text=No+Image"
+    "https://placehold.co/1200x800/141925/e3ebff?text=No+Image",
   ];
   const [index, setIndex] = useState(0);
   const imageSrc = candidates[index] ?? candidates[candidates.length - 1];
@@ -471,7 +578,9 @@ function CardImage({
         width={1200}
         height={800}
         className="image"
-        onError={() => setIndex((current) => Math.min(current + 1, candidates.length - 1))}
+        onError={() =>
+          setIndex((current) => Math.min(current + 1, candidates.length - 1))
+        }
         unoptimized
       />
     </div>
