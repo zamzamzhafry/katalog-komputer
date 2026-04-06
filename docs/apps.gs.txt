@@ -1,0 +1,84 @@
+/**
+ * KONFIGURASI DATABASE (WAJIB)
+ */
+const DB_CONFIG = {
+  SPREADSHEET_ID: "1JvhLsioCfQlp53kqsbaPwD44r4u5ICFCkws0seD8jIg", // Masukkan ID Sheet Anda
+  SHEET_NAME_KATALOG: "Katalog", // Pastikan nama tab sheet di bawah persis "Katalog"
+};
+
+function doGet(e) {
+  return HtmlService.createTemplateFromFile("Index")
+    .evaluate()
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .setTitle("Katalog Komputer & Laptop");
+}
+
+// Fungsi untuk mengekstrak ID gambar Google Drive agar bisa ditampilkan di HTML
+// function convertDriveLink(url) {
+//   if (!url) return "https://placehold.co/300x200?text=No+Photo";
+//   const idMatch = url.match(/[-\w]{25,}/);
+//   if (idMatch && idMatch.length > 0) {
+//     return "https://drive.google.com/uc?export=view&id=" + idMatch[0];
+//   }
+//   return url;
+// }
+
+// Fungsi untuk mengekstrak ID gambar Google Drive (Menggunakan Thumbnail API)
+function convertDriveLink(url) {
+  if (!url) return "https://placehold.co/300x200?text=No+Photo";
+  const idMatch = url.match(/[-\w]{25,}/);
+  if (idMatch && idMatch.length > 0) {
+    // Menggunakan Thumbnail API dengan ukuran lebar 800px (w800)
+    // Ini adalah cara paling ampuh untuk bypass CORS & Cookie block di dalam Web App GAS
+    return "https://drive.google.com/thumbnail?id=" + idMatch[0] + "&sz=w800";
+  }
+  return url;
+}
+
+/**
+ * FUNGSI UTAMA: Mengambil Semua Data Katalog
+ */
+function getCatalogData() {
+  try {
+    const ss = SpreadsheetApp.openById(DB_CONFIG.SPREADSHEET_ID);
+    const sheet = ss.getSheetByName(DB_CONFIG.SHEET_NAME_KATALOG);
+
+    if (!sheet) {
+      throw new Error(
+        "Tab Sheet '" + DB_CONFIG.SHEET_NAME_KATALOG + "' tidak ditemukan.",
+      );
+    }
+
+    const dataAll = sheet.getDataRange().getDisplayValues();
+    const headers = dataAll[0];
+    const rows = dataAll.slice(1);
+
+    // Konversi baris menjadi Array of Objects
+    let catalog = rows.map((row) => {
+      let rawPhotoUrl = row[9]; // Asumsi kolom J (index 9) adalah link Drive
+
+      return {
+        ProductID: row[0],
+        Kategori: row[1],
+        Brand: row[2],
+        Model: row[3],
+        Processor: row[4],
+        RAM: row[5],
+        Storage: row[6],
+        Harga: row[7],
+        Stok: row[8],
+        FotoURL: convertDriveLink(rawPhotoUrl),
+        Deskripsi: row[10] || "",
+      };
+    });
+
+    // Filter baris yang kosong
+    catalog = catalog.filter((item) => item.ProductID !== "");
+
+    return catalog;
+  } catch (e) {
+    console.error("Server Error: " + e.message);
+    return { error: true, message: e.message };
+  }
+}

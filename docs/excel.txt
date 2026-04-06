@@ -1,0 +1,9 @@
+
+ProductID	Kategori	Brand	Model	Processor	RAM	Storage	Harga	Stok	Link Drive Gambar	Deskripsi	
+LAP-001	Laptop	Acer	ROG Zephyrus G14	AMD Ryzen 9 7940HS	16GB	1TB NVMe	Rp 26.500.000	5	https://drive.google.com/file/d/1AX7srz6AbtMb15tgGJ7XXrI2_P4CBStf/view?usp=drive_link	Laptop gaming ringan dengan performa buas, cocok untuk editing video dan e-sports.	
+LAP-002	Laptop	Apple	MacBook Air M2	Apple M2 (8-Core)	8GB	256GB SSD	Rp 18.000.000	12	https://drive.google.com/file/d/1QdEcPNBi4Aw68XVOhICfvu0e_kiZeFfa/view?usp=drive_link	Laptop gaming ringan dengan performa buas, cocok untuk editing video dan e-sports.	
+LAP-003	Laptop	Lenovo	IdeaPad Gaming 3	Intel Core i5-12450H	8GB	512GB SSD	Rp 11.500.000	8	https://drive.google.com/file/d/1fzav27nbNkPrm3DzfkAXXKtr9BFucmeM/view?usp=drive_link	Laptop gaming ringan dengan performa buas, cocok untuk editing video dan e-sports.	
+PC-001	PC	Custom	Rakitan Gaming Mid	Intel Core i5-13400F	16GB	1TB NVMe	Rp 14.200.000	3	https://drive.google.com/file/d/1kSm2TwBa5pgVnvlyNO3vsJWXGTHV2fU2/view?usp=drive_link	Laptop gaming ringan dengan performa buas, cocok untuk editing video dan e-sports.	
+PC-002	PC	HP	Pavilion Desktop	AMD Ryzen 5 5600G	8GB	512GB SSD	Rp 8.500.000	0	https://drive.google.com/file/d/1PAbmiG1GgrMCo78NJqgz_KgjwBvQnt5Q/view?usp=drive_link	Laptop gaming ringan dengan performa buas, cocok untuk editing video dan e-sports.	
+ACC-001	Aksesoris	Logitech	Mouse MX Master 3S	N/A	N/A	N/A	Rp 1.650.000	25	https://drive.google.com/file/d/1pORqjRSHoo32sxeIKmDJClHI_wORhPgK/view?usp=drive_link		
+ACC-002	Aksesoris	Keychron	Keyboard K2 V2	N/A	N/A	N/A	Rp 1.350.000	10	https://drive.google.com/file/d/1b8ORUCoXWs9mwxRcZLyXlKgu0-cYorJO/view?usp=drive_link	Fitur Unggulan:	
