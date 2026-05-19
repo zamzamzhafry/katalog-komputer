@@ -1,0 +1,114 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import type { CatalogItem } from "@/lib/types";
+import { updateCatalogItem, deleteCatalogItem } from "@/lib/supabase/admin";
+import { ImageUpload } from "@/components/image-upload";
+
+interface AdminDashboardProps {
+  items: CatalogItem[];
+  onItemUpdated: () => void;
+  onEditItem: (item: CatalogItem) => void;
+}
+
+export function AdminDashboard({ items, onItemUpdated, onEditItem }: AdminDashboardProps) {
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  async function handleDelete(productId: string) {
+    if (!confirm("Hapus item " + productId + "? Aksi ini tidak bisa dibatalkan.")) {
+      return;
+    }
+    setDeleting(productId);
+    const { success, error } = await deleteCatalogItem(productId);
+    if (!success) {
+      alert("Gagal hapus: " + (error ?? "Unknown error"));
+    } else {
+      onItemUpdated();
+    }
+    setDeleting(null);
+  }
+
+  return (
+    <div className="admin-dashboard">
+      <h2>Admin Dashboard</h2>
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Foto</th>
+              <th>ID</th>
+              <th>Brand</th>
+              <th>Model</th>
+              <th>Kategori</th>
+              <th>Harga</th>
+              <th>Stok</th>
+              <th>Upload</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.length === 0 ? (
+              <tr>
+                <td colSpan={9} className="admin-empty">
+                  Tidak ada item
+                </td>
+              </tr>
+            ) : (
+              items.map((item) => (
+                <tr key={item.ProductID}>
+                  <td>
+                    <Image
+                      src={item.FotoURL || "https://placehold.co/96x72/141925/e3ebff?text=No"}
+                      alt={item.Model}
+                      width={48}
+                      height={36}
+                      className="admin-thumb"
+                      unoptimized
+                    />
+                  </td>
+                  <td>{item.ProductID}</td>
+                  <td>{item.Brand}</td>
+                  <td>{item.Model}</td>
+                  <td>{item.Kategori}</td>
+                  <td>{item.Harga}</td>
+                  <td>
+                    <span className={"stock-badge " + (item.Stok > 0 ? "in" : "out")}>
+                      {item.Stok > 0 ? item.Stok : "Kosong"}
+                    </span>
+                  </td>
+                  <td>
+                    <ImageUpload
+                      productId={item.ProductID}
+                      currentPath={null}
+                      onUploaded={() => onItemUpdated()}
+                    />
+                  </td>
+                  <td>
+                    <div className="admin-actions">
+                      <button
+                        className="btn-edit"
+                        type="button"
+                        onClick={() => onEditItem(item)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn-delete"
+                        type="button"
+                        onClick={() => handleDelete(item.ProductID)}
+                        disabled={deleting === item.ProductID}
+                      >
+                        {deleting === item.ProductID ? "..." : "Hapus"}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

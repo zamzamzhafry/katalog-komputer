@@ -7,6 +7,12 @@ import { useEffect, useMemo, useState } from "react";
 import { parseCatalogTsv } from "@/lib/parse";
 import { seedTsv } from "@/lib/seed";
 import { readCatalogStorage, writeCatalogStorage } from "@/lib/storage";
+import { fetchCatalog } from "@/lib/supabase/catalog";
+import { getUser } from "@/lib/supabase/auth";
+import { updateCatalogItem } from "@/lib/supabase/admin";
+import { LoginPanel } from "@/components/login-panel";
+import { AdminDashboard } from "@/components/admin-dashboard";
+import type { User } from "@supabase/supabase-js";
 import type { CatalogItem } from "@/lib/types";
 
 type EditState = {
@@ -36,18 +42,48 @@ export function CatalogApp() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<EditState | null>(null);
   const [detailItem, setDetailItem] = useState<CatalogItem | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [showDashboard, setShowDashboard] = useState(false);
 
   useEffect(() => {
-    const saved = readCatalogStorage();
-    if (saved && saved.length > 0) {
-      setItems(saved);
-      return;
-    }
+    async function loadCatalog() {
+      const remote = await fetchCatalog();
+      if (remote && remote.length > 0) {
+        setItems(remote);
+        return;
+      }
 
-    const seeded = parseCatalogTsv(seedTsv);
-    setItems(seeded);
-    writeCatalogStorage(seeded);
+      const saved = readCatalogStorage();
+      if (saved && saved.length > 0) {
+        setItems(saved);
+        return;
+      }
+
+      const seeded = parseCatalogTsv(seedTsv);
+      setItems(seeded);
+      writeCatalogStorage(seeded);
+    }
+    loadCatalog();
+    checkAuth();
   }, []);
+
+  async function checkAuth() {
+    const { user: currentUser } = await getUser();
+    setUser(currentUser ?? null);
+    if (currentUser) {
+      setEditMode(true);
+    } else {
+      setEditMode(false);
+      setShowDashboard(false);
+    }
+  }
+
+  async function reloadFromSupabase() {
+    const remote = await fetchCatalog();
+    if (remote && remote.length > 0) {
+      setItems(remote);
+    }
+  }
 
   useEffect(() => {
     if (items.length > 0) {
@@ -117,33 +153,42 @@ export function CatalogApp() {
     setEditValue(null);
   }
 
-  function saveEdit(): void {
+  async function saveEdit(): Promise<void> {
     if (!editValue || !editingId) {
       return;
     }
 
     const nextStock = Number.parseInt(editValue.Stok, 10) || 0;
 
+    const updatedItem: CatalogItem = {
+      ProductID: editValue.ProductID,
+      Kategori: editValue.Kategori,
+      Brand: editValue.Brand,
+      Model: editValue.Model,
+      Processor: editValue.Processor,
+      RAM: editValue.RAM,
+      Storage: editValue.Storage,
+      Harga: editValue.Harga,
+      Stok: nextStock,
+      FotoURL: editValue.FotoURL,
+      Deskripsi: editValue.Deskripsi,
+    };
+
+    // Write to Supabase if authenticated
+    if (user) {
+      const { success, error } = await updateCatalogItem(updatedItem);
+      if (!success) {
+        alert("Gagal simpan ke Supabase: " + (error ?? "Unknown error"));
+        return;
+      }
+    }
+
     setItems((prev) =>
       prev.map((item) => {
         if (item.ProductID !== editingId) {
           return item;
         }
-
-        return {
-          ...item,
-          ProductID: editValue.ProductID,
-          Kategori: editValue.Kategori,
-          Brand: editValue.Brand,
-          Model: editValue.Model,
-          Processor: editValue.Processor,
-          RAM: editValue.RAM,
-          Storage: editValue.Storage,
-          Harga: editValue.Harga,
-          Stok: nextStock,
-          FotoURL: editValue.FotoURL,
-          Deskripsi: editValue.Deskripsi,
-        };
+        return { ...item, ...updatedItem };
       }),
     );
 
@@ -188,6 +233,24 @@ export function CatalogApp() {
 
   return (
     <main className="shell">
+      <LoginPanel user={user} onAuthChange={checkAuth} />
+      {user && (
+        <button
+          className="primary"
+          style={{ marginBottom: "1rem" }}
+          type="button"
+          onClick={() => setShowDashboard((v) => !v)}
+        >
+          {showDashboard ? "Tutup Dashboard" : "Admin Dashboard"}
+        </button>
+      )}
+      {showDashboard && user && (
+        <AdminDashboard
+          items={items}
+          onItemUpdated={reloadFromSupabase}
+          onEditItem={openEdit}
+        />
+      )}
       <div className="bg-glow bg-glow-1" />
       <div className="bg-glow bg-glow-2" />
 
