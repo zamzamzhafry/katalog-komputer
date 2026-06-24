@@ -31,3 +31,10 @@ export function createServerClient() {
     },
   );
 }
+
+/** Server-side user check (RSC/middleware). Null kalau no session. */
+export async function getUserServer() {
+  const supabase = createServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
+}

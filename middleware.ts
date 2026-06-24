@@ -29,7 +29,24 @@ export async function middleware(req: NextRequest) {
   );
 
   // Refresh session. Jangan pakai getUser() supaya tidak extend session di edge (lebih simple: getSession refresh cookie).
-  await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  // Protect /dashboard: butuh session. Else redirect /login.
+  const path = req.nextUrl.pathname;
+  if (path.startsWith("/dashboard") && !session) {
+    const loginUrl = req.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    loginUrl.searchParams.set("redirect", path);
+    return NextResponse.redirect(loginUrl);
+  }
+  // Sudah login + buka /login -> redirect /dashboard (hindari double-login).
+  if (path === "/login" && session) {
+    const dashUrl = req.nextUrl.clone();
+    dashUrl.pathname = "/dashboard";
+    return NextResponse.redirect(dashUrl);
+  }
 
   return res;
 }

@@ -1,9 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
-import { LoginPanel } from "@/components/login-panel";
-import { AdminDashboard } from "@/components/admin-dashboard";
 import { CatalogModal } from "@/components/catalog-modal";
 import { ProductCard } from "@/components/product-card";
 import { CatalogToolbar } from "@/components/catalog-toolbar";
@@ -11,9 +10,9 @@ import { CatalogStats } from "@/components/catalog-stats";
 import { ErrorBanner } from "@/components/error-banner";
 import { ToastProvider, useToast } from "@/components/toast";
 import { useCatalogData } from "@/lib/hooks/use-catalog-data";
-import { useAuth } from "@/lib/hooks/use-auth";
 import { useCatalogUI } from "@/lib/hooks/use-catalog-ui";
 import { formatHarga } from "@/lib/format";
+import { getUser } from "@/lib/supabase/auth";
 import type { CatalogItem } from "@/lib/types";
 
 const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER ?? "628123123123";
@@ -43,31 +42,21 @@ function CatalogAppInner({
 }) {
   const { toast } = useToast();
   const { items, setItems, categories, summary } = useCatalogData(initialItems);
-  const { user, checkAuth, login, logout } = useAuth();
   const ui = useCatalogUI({ items, setItems, onToast: toast });
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Cek admin (client) -> tampilkan link "Dashboard" saja, bukan inline edit.
+  useEffect(() => {
+    getUser().then(({ user }) => setIsAdmin(Boolean(user)));
+  }, []);
 
   return (
     <main className="shell">
-      <LoginPanel user={user} onAuthChange={checkAuth} />
-      {user && (
-        <button
-          className="primary"
-          style={{ marginBottom: "1rem" }}
-          type="button"
-          onClick={() => ui.setShowDashboard((v) => !v)}
-        >
-          {ui.showDashboard ? "Tutup Dashboard" : "Admin Dashboard"}
-        </button>
+      {isAdmin && (
+        <div className="topbar">
+          <a className="ghost" href="/dashboard">Dashboard Admin</a>
+        </div>
       )}
-      {ui.showDashboard && user && (
-        <AdminDashboard
-          items={items}
-          onItemDeleted={(id) => ui.actions.deleteItem(id)}
-          onEditItem={ui.actions.openEdit}
-        />
-      )}
-      {/* Q12: HOT EDIT FAB commented out (hide, hapus kedepan). */}
-      {/* <button className={`hot-edit-fab ${editMode ? "active" : ""}`} ...>HOT EDIT</button> */}
 
       <section className="container">
         <motion.div
@@ -100,8 +89,6 @@ function CatalogAppInner({
               key={item.ProductID}
               item={item}
               onOpenDetail={ui.actions.openDetail}
-              onEdit={ui.actions.openEdit}
-              canEdit={Boolean(user)}
             />
           ))}
         </motion.section>
@@ -134,7 +121,6 @@ export function CatalogApp(props: {
   initialItems: CatalogItem[];
   initialError: boolean;
 }) {
-  // ToastProvider di root supaya useToast tersedia di seluruh subtree (Q13).
   return (
     <ToastProvider>
       <CatalogAppInner {...props} />
