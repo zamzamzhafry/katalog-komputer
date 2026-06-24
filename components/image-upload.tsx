@@ -1,54 +1,47 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { uploadCatalogImage } from "@/app/actions/catalog";
+import { useToast } from "@/components/toast";
 
 interface ImageUploadProps {
   productId: string;
   currentPath: string | null;
-  onUploaded: (newPath: string) => void;
+  onUploaded: () => void;
 }
 
 export function ImageUpload({ productId, currentPath, onUploaded }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Preview
+    // Preview lokal (data-URL).
     const reader = new FileReader();
     reader.onload = () => setPreview(reader.result as string);
     reader.readAsDataURL(file);
 
     setUploading(true);
-    const supabase = createClient();
+    // Q16-C/Q18: Server Action upload + update DB + rollback orphan + cleanup old.
+    const { success, error, path } = await uploadCatalogImage(
+      productId,
+      file,
+      currentPath,
+    );
+    setUploading(false);
 
-    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const storagePath = "products/" + productId + "." + ext;
-
-    const { error } = await supabase.storage
-      .from("catalog-images")
-      .upload(storagePath, file, {
-        upsert: true,
-        contentType: file.type,
-      });
-
-    if (error) {
-      alert("Upload gagal: " + error.message);
+    if (!success) {
+      toast(error ?? "Upload gagal.", "error");
       setPreview(null);
     } else {
-      // Update the catalog item image_path
-      await supabase
-        .from("catalog_items")
-        .update({ image_path: storagePath })
-        .eq("product_id", productId);
-
-      onUploaded(storagePath);
+      toast("Foto diunggah.", "success");
+      onUploaded();
+      void path;
     }
-    setUploading(false);
   }
 
   return (
@@ -69,6 +62,8 @@ export function ImageUpload({ productId, currentPath, onUploaded }: ImageUploadP
         style={{ display: "none" }}
       />
       {preview && (
+        // data-URL preview, bukan remote image -> eslint-disable (Q18).
+        // eslint-disable-next-line @next/next/no-img-element
         <img src={preview} alt="Preview" className="upload-preview" />
       )}
     </div>

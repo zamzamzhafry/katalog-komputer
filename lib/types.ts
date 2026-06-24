@@ -6,7 +6,7 @@ export type CatalogItem = {
   Processor: string;
   RAM: string;
   Storage: string;
-  Harga: string;
+  Harga: number;
   Stok: number;
   FotoURL: string;
   Deskripsi: string;

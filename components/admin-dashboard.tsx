@@ -2,30 +2,27 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import type { CatalogItem } from "@/lib/types";
-import { updateCatalogItem, deleteCatalogItem } from "@/lib/supabase/admin";
+import { formatHarga } from "@/lib/format";
 import { ImageUpload } from "@/components/image-upload";
 
 interface AdminDashboardProps {
   items: CatalogItem[];
-  onItemUpdated: () => void;
+  onItemDeleted: (productId: string) => Promise<boolean> | boolean;
   onEditItem: (item: CatalogItem) => void;
 }
 
-export function AdminDashboard({ items, onItemUpdated, onEditItem }: AdminDashboardProps) {
+export function AdminDashboard({ items, onItemDeleted, onEditItem }: AdminDashboardProps) {
   const [deleting, setDeleting] = useState<string | null>(null);
+  const router = useRouter();
 
   async function handleDelete(productId: string) {
     if (!confirm("Hapus item " + productId + "? Aksi ini tidak bisa dibatalkan.")) {
       return;
     }
     setDeleting(productId);
-    const { success, error } = await deleteCatalogItem(productId);
-    if (!success) {
-      alert("Gagal hapus: " + (error ?? "Unknown error"));
-    } else {
-      onItemUpdated();
-    }
+    await onItemDeleted(productId);
     setDeleting(null);
   }
 
@@ -71,17 +68,18 @@ export function AdminDashboard({ items, onItemUpdated, onEditItem }: AdminDashbo
                   <td>{item.Brand}</td>
                   <td>{item.Model}</td>
                   <td>{item.Kategori}</td>
-                  <td>{item.Harga}</td>
+                  <td>{formatHarga(item.Harga)}</td>
                   <td>
                     <span className={"stock-badge " + (item.Stok > 0 ? "in" : "out")}>
                       {item.Stok > 0 ? item.Stok : "Kosong"}
                     </span>
                   </td>
                   <td>
+                    {/* ponytail: currentPath null -> cleanup file lama skip. Tambah imagePath ke CatalogItem + mapRow kalau mau cleanup old file di upload (Q18). */}
                     <ImageUpload
                       productId={item.ProductID}
                       currentPath={null}
-                      onUploaded={() => onItemUpdated()}
+                      onUploaded={() => router.refresh()}
                     />
                   </td>
                   <td>

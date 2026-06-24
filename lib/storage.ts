@@ -47,7 +47,7 @@ function isCatalogItem(value: unknown): value is CatalogItem {
     typeof item.Processor === "string" &&
     typeof item.RAM === "string" &&
     typeof item.Storage === "string" &&
-    typeof item.Harga === "string" &&
+    (typeof item.Harga === "number" || typeof item.Harga === "string") &&
     typeof item.Stok === "number" &&
     typeof item.FotoURL === "string" &&
     typeof item.Deskripsi === "string"
