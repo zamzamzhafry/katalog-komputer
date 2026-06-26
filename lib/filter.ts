@@ -17,9 +17,12 @@ export function filterItems(
     }
     const haystack = [
       item.ProductID,
+      item.Kategori,
       item.Brand,
       item.Model,
       item.Processor,
+      item.RAM,
+      item.Storage,
       item.Deskripsi,
     ]
       .join(" ")

@@ -34,8 +34,8 @@
   --r-card: 14px;
   --r-pill: 999px;
 
-  /* Focus ring (unified alpha; was 26/33 drift) */
-  --focus-ring: 0 0 0 3px #2c4f8d33;
+  /* Focus ring: offset accent ring (SC 1.4.11, 3:1 min on dark). */
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
 }
 
 * {

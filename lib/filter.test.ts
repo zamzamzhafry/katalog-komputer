@@ -36,3 +36,14 @@ test("filterItems: category + query combined", () => {
   assert.equal(r.length, 1);
   assert.equal(r[0].ProductID, "PC-001");
 });
+
+test("filterItems: query hits RAM (16GB matches 2)", () => {
+  const r = filterItems(items, "16GB", "Semua");
+  assert.equal(r.length, 2);
+});
+
+test("filterItems: query hits Kategori (PC)", () => {
+  const r = filterItems(items, "pc", "Semua");
+  assert.equal(r.length, 1);
+  assert.equal(r[0].ProductID, "PC-001");
+});
