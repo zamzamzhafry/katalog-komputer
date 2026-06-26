@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { formatHarga, parseHargaToNumber } from "@/lib/format";
 import type { CatalogItem } from "@/lib/types";
@@ -28,11 +28,24 @@ export function CatalogModal({
 }: CatalogModalProps) {
   const open = Boolean(editValue || detailItem);
 
+  // Escape to close (a11y: keyboard users can't click backdrop).
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
   return (
     <AnimatePresence>
       {open ? (
         <motion.div
           className="modal-wrap"
+          role="dialog"
+          aria-modal="true"
+          aria-label={editValue ? "Edit item" : "Detail produk"}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
