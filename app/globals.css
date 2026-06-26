@@ -1,5 +1,7 @@
 :root {
   color-scheme: dark;
+
+  /* Brand palette (preserved) */
   --bg: #0a0e14;
   --panel: #11161f;
   --panel-soft: #151b26;
@@ -12,6 +14,28 @@
   --good: #3fb950;
   --warn: #f4704d;
   --font-mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, monospace;
+
+  /* Spacing scale (8px rhythm). Replaces ad-hoc 0.3/0.5/0.7/0.85 drift. */
+  --sp-1: 0.25rem;   /* 4 */
+  --sp-2: 0.5rem;    /* 8 */
+  --sp-3: 0.75rem;   /* 12 */
+  --sp-4: 1rem;      /* 16 */
+  --sp-5: 1.25rem;   /* 20 */
+  --sp-6: 1.5rem;    /* 24 */
+  --sp-7: 2rem;      /* 32 */
+  --sp-8: 2.5rem;    /* 40 */
+  --sp-9: 3rem;      /* 48 */
+  --sp-10: 4rem;     /* 64 */
+
+  /* Radius scale (one rule, documented).
+     card=14, field=8, sm=6 (badges/thumbs), pill=999. */
+  --r-sm: 6px;
+  --r-field: 8px;
+  --r-card: 14px;
+  --r-pill: 999px;
+
+  /* Focus ring (unified alpha; was 26/33 drift) */
+  --focus-ring: 0 0 0 3px #2c4f8d33;
 }
 
 * {
@@ -28,10 +52,17 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Global keyboard focus (was missing on buttons). Mouse focus unaffected. */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--r-field);
+}
+
 .shell {
   position: relative;
   min-height: 100vh;
-  padding: 2rem 1.2rem 4rem;
+  padding: var(--sp-7) var(--sp-5) var(--sp-10);
 }
 
 .container {
@@ -43,17 +74,17 @@ body {
 
 /* Stats */
 .stats {
-  margin-top: 1.2rem;
+  margin-top: var(--sp-6);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.7rem;
+  gap: var(--sp-3);
 }
 
 .stat-card {
   border: 1px solid var(--line);
   background: var(--panel);
-  border-radius: 12px;
-  padding: 0.9rem 1rem;
+  border-radius: var(--r-card);
+  padding: var(--sp-3) var(--sp-4);
 }
 
 .stat-card span {
@@ -65,7 +96,7 @@ body {
 
 .stat-card strong {
   display: block;
-  margin-top: 0.3rem;
+  margin-top: var(--sp-1);
   font-size: 1.3rem;
   font-family: var(--font-mono);
   font-weight: 600;
@@ -74,10 +105,10 @@ body {
 
 /* Toolbar */
 .toolbar {
-  margin-top: 1.5rem;
+  margin-top: var(--sp-7);
   display: grid;
   grid-template-columns: 1fr 190px;
-  gap: 0.6rem;
+  gap: var(--sp-2);
 }
 
 .search,
@@ -88,10 +119,10 @@ body {
 .field input,
 .field textarea {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--r-field);
   color: var(--ink);
   background: var(--panel);
-  padding: 0.7rem 0.85rem;
+  padding: var(--sp-3) var(--sp-5);
   outline: none;
   font-size: 0.88rem;
 }
@@ -106,7 +137,7 @@ body {
 .field input:focus,
 .field textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px #2c4f8d33;
+  box-shadow: var(--focus-ring);
 }
 
 .ghost,
@@ -131,14 +162,14 @@ body {
   background: var(--panel-soft);
 }
 
-/* WhatsApp CTA — solid green (go/contact semantic) */
+/* WhatsApp CTA: solid green (go/contact semantic). Brand-recognized exception to accent lock. */
 .wa-order-btn {
   background: linear-gradient(145deg, #1fb86a, #139656);
   border: 0;
   color: #04130a;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: var(--sp-2);
   min-width: 210px;
   justify-content: center;
   font-weight: 700;
@@ -146,16 +177,16 @@ body {
 
 /* Grid + Cards (spec-sheet identity) */
 .grid {
-  margin-top: 1.1rem;
+  margin-top: var(--sp-5);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.8rem;
+  gap: var(--sp-4);
 }
 
 .card {
   border: 1px solid var(--line);
   background: var(--panel);
-  border-radius: 14px;
+  border-radius: var(--r-card);
   overflow: hidden;
   cursor: pointer;
   transition: border-color 0.2s ease;
@@ -179,17 +210,17 @@ body {
 }
 
 .card-body {
-  padding: 0.9rem;
+  padding: var(--sp-3);
 }
 
 .card-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--sp-2);
 }
 
-/* ProductID corner tag — inventory signature */
+/* ProductID corner tag: inventory signature */
 .card-id {
   font-family: var(--font-mono);
   font-size: 0.7rem;
@@ -200,7 +231,7 @@ body {
 .pill {
   border: 1px solid var(--line);
   color: var(--mono);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   font-family: var(--font-mono);
   font-size: 0.68rem;
   padding: 0.2rem 0.55rem;
@@ -223,7 +254,7 @@ body {
 }
 
 .card h2 {
-  margin: 0.7rem 0 0;
+  margin: var(--sp-3) 0 0;
   font-size: 1.05rem;
   font-weight: 600;
 }
@@ -235,9 +266,9 @@ body {
   font-weight: 400;
 }
 
-/* Price — amber signature pop */
+/* Price: amber signature pop */
 .card-price {
-  margin: 0.7rem 0 0;
+  margin: var(--sp-3) 0 0;
   font-size: 1.1rem;
   font-weight: 700;
   font-family: var(--font-mono);
@@ -250,12 +281,12 @@ body {
   font-size: 0.72rem;
 }
 
-/* Specs — mono key/value */
+/* Specs: mono key/value */
 .specs {
   margin: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.35rem 0.8rem;
+  gap: 0.35rem var(--sp-4);
 }
 
 .specs dt {
@@ -273,9 +304,9 @@ body {
 }
 
 .actions {
-  margin-top: 0.7rem;
+  margin-top: var(--sp-3);
   display: flex;
-  gap: 0.5rem;
+  gap: var(--sp-2);
   justify-content: flex-end;
 }
 
@@ -288,26 +319,26 @@ body {
   backdrop-filter: blur(4px);
   display: grid;
   place-items: center;
-  padding: 1rem;
+  padding: var(--sp-4);
 }
 
 .modal {
   width: min(880px, 100%);
   max-height: 90vh;
   overflow: auto;
-  border-radius: 14px;
+  border-radius: var(--r-card);
   border: 1px solid var(--line);
   background: var(--panel);
-  padding: 1.2rem;
+  padding: var(--sp-5);
 }
 
 .modal h4 {
-  margin: 0 0 0.9rem;
+  margin: 0 0 var(--sp-4);
   font-size: 1.1rem;
 }
 
 .order-intro {
-  margin: 0 0 0.9rem;
+  margin: 0 0 var(--sp-4);
   color: var(--price);
   font-family: var(--font-mono);
   font-weight: 700;
@@ -315,20 +346,20 @@ body {
 }
 
 .detail-desc {
-  margin: 0 0 0.9rem;
+  margin: 0 0 var(--sp-4);
   color: var(--mono);
   line-height: 1.55;
   font-size: 0.9rem;
 }
 
 .detail-specs {
-  margin-top: 0.6rem;
+  margin-top: var(--sp-3);
 }
 
 .detail-image {
-  margin-bottom: 0.9rem;
+  margin-bottom: var(--sp-4);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--r-field);
   overflow: hidden;
 }
 
@@ -341,12 +372,12 @@ body {
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.7rem;
+  gap: var(--sp-3);
 }
 
 .field {
   display: grid;
-  gap: 0.3rem;
+  gap: var(--sp-1);
 }
 
 .field span {
@@ -368,19 +399,19 @@ body {
 }
 
 .modal-actions {
-  margin-top: 0.9rem;
+  margin-top: var(--sp-4);
   display: flex;
   justify-content: flex-end;
   gap: 0.55rem;
 }
 
 .footer {
-  margin-top: 2.5rem;
+  margin-top: var(--sp-8);
   color: var(--mono);
   text-align: center;
   font-size: 0.78rem;
   font-family: var(--font-mono);
-  padding: 1.25rem 0 0.5rem;
+  padding: var(--sp-5) 0 var(--sp-2);
   border-top: 1px solid var(--line);
 }
 
@@ -388,12 +419,12 @@ body {
 .login-panel {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 0.9rem;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-5);
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 10px;
-  margin-bottom: 1.2rem;
+  border-radius: var(--r-field);
+  margin-bottom: var(--sp-5);
   flex-wrap: wrap;
 }
 
@@ -402,8 +433,8 @@ body {
 }
 
 .login-input {
-  padding: 0.45rem 0.7rem;
-  border-radius: 6px;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-sm);
   border: 1px solid var(--line);
   background: var(--bg);
   color: var(--ink);
@@ -414,7 +445,7 @@ body {
 .login-input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px #2c4f8d26;
+  box-shadow: var(--focus-ring);
 }
 
 .login-error {
@@ -430,27 +461,27 @@ body {
   font-family: var(--font-mono);
   padding: 0.2rem 0.55rem;
   background: #1a2333;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
 }
 
 /* Admin Dashboard */
 .admin-dashboard {
-  margin-top: 1.5rem;
-  padding: 1.2rem;
+  margin-top: var(--sp-6);
+  padding: var(--sp-5);
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--r-card);
 }
 
 .admin-dashboard h2 {
-  margin: 0 0 1rem;
+  margin: 0 0 var(--sp-4);
   font-size: 1.15rem;
   color: var(--ink);
 }
 
 .admin-table-wrap {
   overflow-x: auto;
-  border-radius: 8px;
+  border-radius: var(--r-field);
   border: 1px solid var(--line);
 }
 
@@ -469,13 +500,13 @@ body {
   letter-spacing: 0.05em;
   font-size: 0.7rem;
   text-align: left;
-  padding: 0.65rem 0.8rem;
+  padding: var(--sp-3) var(--sp-5);
   border-bottom: 1px solid var(--line);
   white-space: nowrap;
 }
 
 .admin-table td {
-  padding: 0.55rem 0.8rem;
+  padding: var(--sp-2) var(--sp-5);
   border-bottom: 1px solid var(--line-soft);
   color: var(--ink);
   vertical-align: middle;
@@ -492,7 +523,7 @@ body {
 .admin-table .stock-badge {
   display: inline-block;
   padding: 0.12rem 0.45rem;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   font-size: 0.74rem;
   font-weight: 600;
   font-family: var(--font-mono);
@@ -510,13 +541,13 @@ body {
 
 .admin-actions {
   display: flex;
-  gap: 0.4rem;
+  gap: var(--sp-2);
 }
 
 .admin-actions button {
-  padding: 0.3rem 0.6rem;
+  padding: var(--sp-1) var(--sp-2);
   font-size: 0.76rem;
-  border-radius: 5px;
+  border-radius: var(--r-sm);
   cursor: pointer;
 }
 
@@ -542,7 +573,7 @@ body {
 
 .admin-empty {
   text-align: center;
-  padding: 2rem;
+  padding: var(--sp-7);
   color: var(--mono);
 }
 
@@ -550,7 +581,7 @@ body {
   width: 48px;
   height: 36px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   background: var(--panel-soft);
   border: 1px solid var(--line);
 }
@@ -559,14 +590,14 @@ body {
 .image-upload {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  margin-top: 0.5rem;
+  gap: var(--sp-2);
+  margin-top: var(--sp-1);
 }
 
 .btn-upload {
-  padding: 0.38rem 0.75rem;
+  padding: 0.38rem var(--sp-2);
   font-size: 0.78rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   background: #13203b;
   color: var(--accent);
   border: 1px solid #1e3050;
@@ -587,25 +618,25 @@ body {
   width: 60px;
   height: 45px;
   object-fit: cover;
-  border-radius: 5px;
+  border-radius: var(--r-sm);
   border: 1px solid var(--line);
 }
 
 /* Toast (Q13) */
 .toast-stack {
   position: fixed;
-  bottom: 1.2rem;
-  right: 1.2rem;
+  bottom: var(--sp-5);
+  right: var(--sp-5);
   z-index: 200;
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: var(--sp-2);
   max-width: min(360px, calc(100vw - 2.4rem));
 }
 
 .toast-item {
-  padding: 0.7rem 1rem;
-  border-radius: 8px;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-field);
   border: 1px solid var(--line);
   background: var(--panel);
   color: var(--ink);
@@ -639,9 +670,9 @@ body {
 
 /* Error Banner (Q13) */
 .error-banner {
-  margin: 1rem 0;
-  padding: 0.7rem 1rem;
-  border-radius: 8px;
+  margin: var(--sp-4) 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-field);
   border: 1px solid #5e2a1f;
   background: #2a1410;
   color: #ffcfbf;
@@ -651,9 +682,9 @@ body {
 
 /* Form validation error (Q11) */
 .form-error {
-  margin: 0.6rem 0 0;
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
+  margin: var(--sp-3) 0 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-sm);
   border: 1px solid #5e2a1f;
   background: #2a1410;
   color: var(--warn);
@@ -674,7 +705,7 @@ body {
 /* Topbar (admin link on public catalog) */
 .topbar {
   width: min(1180px, 100%);
-  margin: 0 auto 0.5rem;
+  margin: 0 auto var(--sp-2);
   display: flex;
   justify-content: flex-end;
 }
@@ -684,7 +715,7 @@ body {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 2rem 1.2rem;
+  padding: var(--sp-7) var(--sp-5);
   background: var(--bg);
 }
 
@@ -692,11 +723,11 @@ body {
   width: min(380px, 100%);
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 2rem;
+  border-radius: var(--r-card);
+  padding: var(--sp-7);
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
+  gap: var(--sp-4);
 }
 
 .login-title {
@@ -713,11 +744,11 @@ body {
 
 .login-form .field {
   display: grid;
-  gap: 0.3rem;
+  gap: var(--sp-1);
 }
 
 .login-submit {
-  margin-top: 0.3rem;
+  margin-top: var(--sp-1);
   width: 100%;
 }
 
@@ -726,7 +757,7 @@ body {
   color: var(--mono);
   font-size: 0.8rem;
   text-decoration: none;
-  margin-top: 0.3rem;
+  margin-top: var(--sp-1);
 }
 
 .login-back:hover {
@@ -736,23 +767,23 @@ body {
 /* Dashboard */
 .dash-head {
   width: min(1180px, 100%);
-  margin: 0 auto 1.5rem;
+  margin: 0 auto var(--sp-6);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: var(--sp-4);
   flex-wrap: wrap;
 }
 
 .dash-title {
-  margin: 0 0 0.3rem;
-  font-size: 1.5rem;
+  margin: 0 0 var(--sp-1);
+  font-size: 1.75rem;
   font-weight: 700;
 }
 
 .dash-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--sp-2);
   align-items: center;
   flex-wrap: wrap;
 }
@@ -810,6 +841,6 @@ body {
 
   .admin-table th,
   .admin-table td {
-    padding: 0.5rem;
+    padding: var(--sp-2);
   }
 }
