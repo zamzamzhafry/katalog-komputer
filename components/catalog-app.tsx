@@ -52,13 +52,15 @@ function CatalogAppInner({
 
   return (
     <main className="shell">
+      <a href="#main-content" className="skip-link">Lewati ke konten</a>
       {isAdmin && (
         <div className="topbar">
           <a className="ghost" href="/dashboard">Dashboard Admin</a>
         </div>
       )}
 
-      <section className="container">
+      <section className="container" id="main-content">
+        <h1 className="page-title">Katalog Komputer &amp; Laptop</h1>
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}

@@ -10,6 +10,12 @@ export default async function DashboardPage() {
   const user = await getUserServer();
   if (!user) redirect("/login?redirect=/dashboard");
 
-  const { items } = await fetchCatalogServer();
-  return <DashboardView items={items ?? []} userEmail={user.email ?? ""} />;
+  const { items, error } = await fetchCatalogServer();
+  return (
+    <DashboardView
+      items={items ?? []}
+      userEmail={user.email ?? ""}
+      fetchError={error}
+    />
+  );
 }

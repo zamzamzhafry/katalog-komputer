@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { MotionConfig } from "framer-motion";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,7 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body>{children}</body>
+      <body>
+        {/* Respect prefers-reduced-motion globally (framer-motion JS anims). */}
+        <MotionConfig reducedMotion="user">{children}</MotionConfig>
+      </body>
     </html>
   );
 }

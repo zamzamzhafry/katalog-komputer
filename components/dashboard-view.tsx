@@ -10,18 +10,35 @@ import type { EditState } from "@/lib/edit-state";
 import { saveCatalogItem, deleteCatalogItemAction } from "@/app/actions/catalog";
 import { ImageUpload } from "@/components/image-upload";
 import { CatalogModal } from "@/components/catalog-modal";
+import { ErrorBanner } from "@/components/error-banner";
 import { useToast } from "@/components/toast";
 import { ToastProvider } from "@/components/toast";
 
-export function DashboardView({ items, userEmail }: { items: CatalogItem[]; userEmail: string }) {
+export function DashboardView({
+  items,
+  userEmail,
+  fetchError = false,
+}: {
+  items: CatalogItem[];
+  userEmail: string;
+  fetchError?: boolean;
+}) {
   return (
     <ToastProvider>
-      <DashboardInner items={items} userEmail={userEmail} />
+      <DashboardInner items={items} userEmail={userEmail} fetchError={fetchError} />
     </ToastProvider>
   );
 }
 
-function DashboardInner({ items, userEmail }: { items: CatalogItem[]; userEmail: string }) {
+function DashboardInner({
+  items,
+  userEmail,
+  fetchError,
+}: {
+  items: CatalogItem[];
+  userEmail: string;
+  fetchError: boolean;
+}) {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<EditState | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -112,6 +129,8 @@ function DashboardInner({ items, userEmail }: { items: CatalogItem[]; userEmail:
           </button>
         </div>
       </header>
+
+      <ErrorBanner show={fetchError} hasCache={items.length > 0} />
 
       <div className="admin-dashboard">
         <h2>Daftar Produk ({items.length})</h2>
