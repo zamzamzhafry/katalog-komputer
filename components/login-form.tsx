@@ -24,8 +24,10 @@ export function LoginForm() {
     }
     setEmail("");
     setPassword("");
-    const redirect = params.get("redirect") || "/dashboard";
-    router.push(redirect);
+    const raw = params.get("redirect") || "/dashboard";
+    // Validasi redirect: harus path relatif, bukan //evil.com atau https://...
+    const safe = raw.startsWith("/") && !raw.startsWith("//") ? raw : "/dashboard";
+    router.push(safe);
     router.refresh();
   }
 
@@ -57,7 +59,7 @@ export function LoginForm() {
           autoComplete="current-password"
         />
       </label>
-      {error && <p className="login-error">{error}</p>}
+      {error && <p className="login-error" role="alert">{error}</p>}
       <button className="primary login-submit" type="submit" disabled={loading}>
         {loading ? "Memuat..." : "Masuk"}
       </button>

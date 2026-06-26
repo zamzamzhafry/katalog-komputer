@@ -22,7 +22,6 @@ export function DashboardView({ items, userEmail }: { items: CatalogItem[]; user
 }
 
 function DashboardInner({ items, userEmail }: { items: CatalogItem[]; userEmail: string }) {
-  const [rows, setRows] = useState<CatalogItem[]>(items);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<EditState | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -71,12 +70,6 @@ function DashboardInner({ items, userEmail }: { items: CatalogItem[]; userEmail:
       toast(error ?? "Gagal simpan.", "error");
       return;
     }
-    setRows((prev) => {
-      const exists = prev.some((i) => i.ProductID === item.ProductID);
-      return exists
-        ? prev.map((i) => (i.ProductID === item.ProductID ? { ...i, ...item } : i))
-        : [...prev, item];
-    });
     toast(editingId ? "Item disimpan." : "Item ditambahkan.", "success");
     closeEdit();
     router.refresh();
@@ -91,7 +84,6 @@ function DashboardInner({ items, userEmail }: { items: CatalogItem[]; userEmail:
       toast(error ?? "Gagal hapus.", "error");
       return;
     }
-    setRows((prev) => prev.filter((i) => i.ProductID !== productId));
     toast("Item dihapus.", "success");
     router.refresh();
   }
@@ -122,7 +114,7 @@ function DashboardInner({ items, userEmail }: { items: CatalogItem[]; userEmail:
       </header>
 
       <div className="admin-dashboard">
-        <h2>Daftar Produk ({rows.length})</h2>
+        <h2>Daftar Produk ({items.length})</h2>
         <div className="admin-table-wrap">
           <table className="admin-table">
             <thead>
@@ -139,14 +131,14 @@ function DashboardInner({ items, userEmail }: { items: CatalogItem[]; userEmail:
               </tr>
             </thead>
             <tbody>
-              {rows.length === 0 ? (
+              {items.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="admin-empty">
                     Tidak ada item. Klik &ldquo;+ Tambah Item&rdquo;.
                   </td>
                 </tr>
               ) : (
-                rows.map((item) => (
+                items.map((item) => (
                   <tr key={item.ProductID}>
                     <td>
                       <Image

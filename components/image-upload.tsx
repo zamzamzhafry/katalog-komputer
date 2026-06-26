@@ -20,7 +20,7 @@ export function ImageUpload({ productId, currentPath, onUploaded }: ImageUploadP
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Preview lokal (data-URL).
+    // Preview lokal (data-URL). Reset saat upload selesai supaya tidak stale.
     const reader = new FileReader();
     reader.onload = () => setPreview(reader.result as string);
     reader.readAsDataURL(file);
@@ -39,6 +39,7 @@ export function ImageUpload({ productId, currentPath, onUploaded }: ImageUploadP
       setPreview(null);
     } else {
       toast("Foto diunggah.", "success");
+      setPreview(null);
       onUploaded();
       void path;
     }

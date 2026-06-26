@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClient, getUserServer } from "@/lib/supabase/server";
 import { parseHargaToNumber } from "@/lib/format";
 import type { CatalogItem } from "@/lib/types";
 
@@ -22,19 +22,31 @@ function mapError(message: string, code?: string): string {
   return message || "Operasi gagal.";
 }
 
+/** Authz: semua mutasi butuh session terautentikasi. Jangan andalkan RLS saja. */
+async function requireUser() {
+  const user = await getUserServer();
+  if (!user) return { ok: false as const, error: "Akses ditolak. Login sebagai admin." };
+  return { ok: true as const, user };
+}
+
 /** Validasi server-side (Q11). Null = OK, string = pesan error. */
 function validateItem(item: CatalogItem): string | null {
   if (!item.ProductID.trim()) return "ProductID wajib diisi.";
+  if (!/^[A-Za-z0-9_-]+$/.test(item.ProductID)) return "ProductID: huruf/angka/_/- saja.";
   if (!item.Brand.trim()) return "Brand wajib diisi.";
   if (!item.Model.trim()) return "Model wajib diisi.";
   if (!item.Kategori.trim()) return "Kategori wajib diisi.";
   if (parseHargaToNumber(String(item.Harga)) <= 0) return "Harga tidak valid.";
-  if (!Number.isInteger(item.Stok) || item.Stok < 0) return "Stok harus angka ≥ 0.";
+  if (!Number.isInteger(item.Stok) || item.Stok < 0 || item.Stok > 2147483647)
+    return "Stok harus angka 0 sampai 2147483647.";
   return null;
 }
 
 /** Upsert item (insert atau update by product_id). Q16-C. */
 export async function saveCatalogItem(item: CatalogItem): Promise<ActionResult> {
+  const auth = await requireUser();
+  if (!auth.ok) return { success: false, error: auth.error };
+
   const invalid = validateItem(item);
   if (invalid) return { success: false, error: invalid };
 
@@ -72,7 +84,10 @@ export async function saveCatalogItem(item: CatalogItem): Promise<ActionResult> 
 export async function deleteCatalogItemAction(
   productId: string,
 ): Promise<ActionResult> {
-  if (!productId.trim()) return { success: false, error: "ProductID kosong." };
+  const auth = await requireUser();
+  if (!auth.ok) return { success: false, error: auth.error };
+  if (!productId.trim() || !/^[A-Za-z0-9_-]+$/.test(productId))
+    return { success: false, error: "ProductID tidak valid." };
 
   const supabase = createServerClient();
   const { error } = await supabase
@@ -86,17 +101,30 @@ export async function deleteCatalogItemAction(
   return { success: true };
 }
 
+// MIME -> ext allowlist. Tolak svg/html (XSS inline storage). Magic-byte sniff di server.
+const MIME_EXT: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
+const MAX_BYTES = 2 * 1024 * 1024; // 2MB
+
 /** Upload gambar ke Storage + update image_path DB. Rollback orphan. Q18. */
 export async function uploadCatalogImage(
   productId: string,
   file: File,
   currentPath: string | null,
 ): Promise<ActionResult & { path?: string }> {
-  if (!productId.trim()) return { success: false, error: "ProductID kosong." };
+  const auth = await requireUser();
+  if (!auth.ok) return { success: false, error: auth.error };
+  if (!productId.trim() || !/^[A-Za-z0-9_-]+$/.test(productId))
+    return { success: false, error: "ProductID tidak valid." };
   if (!file) return { success: false, error: "File kosong." };
+  if (file.size > MAX_BYTES) return { success: false, error: "File maks 2MB." };
+  const ext = MIME_EXT[file.type];
+  if (!ext) return { success: false, error: "Hanya jpg/png/webp." };
 
   const supabase = createServerClient();
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
   const storagePath = `products/${productId}.${ext}`;
 
   // 1. Upload ke Storage (upsert overwrite).

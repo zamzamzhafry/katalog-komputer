@@ -24,25 +24,31 @@ export function CatalogToolbar({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, delay: 0.1 }}
     >
-      <input
-        className="search"
-        placeholder="Cari brand, model, processor..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-      />
-      <select
-        className="select"
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-      >
-        {categories.map((value) => (
-          <option key={value} value={value}>
-            {value}
-          </option>
-        ))}
-      </select>
-      {/* Q12: resetToSeed button commented out (HOT EDIT legacy hide). */}
-      {/* <button className="ghost" onClick={onReset} type="button">Reset sample</button> */}
+      <label className="field" style={{ display: "contents" }}>
+        <span className="sr-only">Cari produk</span>
+        <input
+          id="catalog-search"
+          className="search"
+          placeholder="Cari brand, model, processor..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </label>
+      <label className="field" style={{ display: "contents" }}>
+        <span className="sr-only">Filter kategori</span>
+        <select
+          id="catalog-category"
+          className="select"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          {categories.map((value) => (
+            <option key={value} value={value}>
+              {value}
+            </option>
+          ))}
+        </select>
+      </label>
     </motion.section>
   );
 }

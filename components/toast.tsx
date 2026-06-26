@@ -1,9 +1,9 @@
 "use client";
 
-import { createContext, useCallback, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 type ToastKind = "success" | "error" | "info";
-type ToastItem = { id: number; message: string; kind: ToastKind };
+type ToastItem = { id: string; message: string; kind: ToastKind };
 
 type ToastCtx = { toast: (message: string, kind?: ToastKind) => void };
 
@@ -17,14 +17,25 @@ export function useToast() {
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<ToastItem[]>([]);
+  const timers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+
+  // Cleanup semua timer saat unmount (cegah setState di komponen unmount).
+  useEffect(() => {
+    const map = timers.current;
+    return () => {
+      for (const t of map.values()) clearTimeout(t);
+      map.clear();
+    };
+  }, []);
 
   const toast = useCallback((message: string, kind: ToastKind = "info") => {
-    const id = Date.now() + Math.floor(Math.random() * 1000);
+    const id = crypto.randomUUID();
     setItems((prev) => [...prev, { id, message, kind }]);
-    // Auto-hide 3s (Q13).
-    setTimeout(() => {
-      setItems((prev) => prev.filter((t) => t.id !== id));
+    const t = setTimeout(() => {
+      setItems((prev) => prev.filter((x) => x.id !== id));
+      timers.current.delete(id);
     }, 3000);
+    timers.current.set(id, t);
   }, []);
 
   return (

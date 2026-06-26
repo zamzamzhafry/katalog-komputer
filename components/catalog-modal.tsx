@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { formatHarga, parseHargaToNumber } from "@/lib/format";
 import type { CatalogItem } from "@/lib/types";
@@ -28,15 +28,24 @@ export function CatalogModal({
   saving,
 }: CatalogModalProps) {
   const open = Boolean(editValue || detailItem);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const lastFocused = useRef<HTMLElement | null>(null);
 
-  // Escape to close (a11y: keyboard users can't click backdrop).
+  // Escape to close + focus management (a11y: keyboard users can't click backdrop).
   useEffect(() => {
     if (!open) return;
+    lastFocused.current = document.activeElement as HTMLElement;
+    // Fokus ke modal setelah animasi mount. tabIndex=-1 di modal-wrap.
+    const t = setTimeout(() => dialogRef.current?.focus(), 0);
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
     }
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("keydown", onKey);
+      lastFocused.current?.focus();
+    };
   }, [open, onClose]);
 
   return (
@@ -44,6 +53,8 @@ export function CatalogModal({
       {open ? (
         <motion.div
           className="modal-wrap"
+          ref={dialogRef}
+          tabIndex={-1}
           role="dialog"
           aria-modal="true"
           aria-label={editValue ? "Edit item" : "Detail produk"}
@@ -245,7 +256,8 @@ export function CardImage({
     "https://placehold.co/1200x800/141925/e3ebff?text=No+Image",
   ];
   const [index, setIndex] = useState(0);
-  const imageSrc = candidates[index] ?? candidates[candidates.length - 1];
+  const last = candidates.length - 1;
+  const imageSrc = candidates[index] ?? candidates[last];
 
   return (
     <div className="image-wrap">
@@ -256,7 +268,7 @@ export function CardImage({
         height={800}
         className="image"
         onError={() =>
-          setIndex((current) => Math.min(current + 1, candidates.length - 1))
+          setIndex((current) => (current >= last ? last : current + 1))
         }
         unoptimized
       />
