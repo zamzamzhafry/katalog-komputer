@@ -8,11 +8,12 @@ import type { CatalogItem } from "@/lib/types";
 import type { EditState } from "@/lib/edit-state";
 
 interface CatalogModalProps {
-  editValue: EditState | null;
+  /** Edit mode. Optional: public catalog uses detail-only, dashboard passes edit. */
+  editValue?: EditState | null;
   detailItem: CatalogItem | null;
-  onEditChange: (patch: Partial<EditState>) => void;
+  onEditChange?: (patch: Partial<EditState>) => void;
   onClose: () => void;
-  onSave: () => void;
+  onSave?: () => void;
   onOrder: (item: CatalogItem) => void;
   saving?: boolean;
 }
@@ -58,7 +59,7 @@ export function CatalogModal({
             exit={{ opacity: 0, y: 10, scale: 0.98 }}
             onClick={(event) => event.stopPropagation()}
           >
-            {editValue ? (
+            {editValue && onEditChange && onSave ? (
               <EditForm
                 editValue={editValue}
                 onEditChange={onEditChange}
