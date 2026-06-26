@@ -5,7 +5,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { formatHarga, parseHargaToNumber } from "@/lib/format";
 import type { CatalogItem } from "@/lib/types";
-import type { EditState } from "@/lib/hooks/use-catalog";
+import type { EditState } from "@/lib/edit-state";
 
 interface CatalogModalProps {
   editValue: EditState | null;

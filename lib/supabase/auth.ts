@@ -15,12 +15,6 @@ export async function signOut() {
   return { error };
 }
 
-export async function getSession() {
-  const supabase = createClient();
-  const { data: { session }, error } = await supabase.auth.getSession();
-  return { session, error };
-}
-
 export async function getUser() {
   const supabase = createClient();
   const { data: { user }, error } = await supabase.auth.getUser();

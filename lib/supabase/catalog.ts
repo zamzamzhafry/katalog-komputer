@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/supabase/client";
 import { createServerClient } from "@/lib/supabase/server";
 import { getImageUrl } from "@/lib/image-url";
 import { parseHargaToNumber } from "@/lib/format";
@@ -65,25 +64,3 @@ export async function fetchCatalogServer(): Promise<FetchResult> {
   }
 }
 
-/**
- * Browser fetch (client refetch setelah mutasi). Pakai mapRow juga.
- * Returns null if Supabase not configured or error (caller fallback ke cache).
- */
-export async function fetchCatalog(): Promise<CatalogItem[] | null> {
-  if (
-    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-  ) {
-    return null;
-  }
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from("catalog_items")
-    .select("*")
-    .order("product_id", { ascending: true });
-  if (error || !data) {
-    console.error("Supabase fetch error:", error?.message);
-    return null;
-  }
-  return data.map(mapRow);
-}
